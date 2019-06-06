@@ -22,7 +22,298 @@ from ..io.dtype_utils import integers_to_slices
 from ..io.io_utils import format_time, format_size
 
 
-class Process(object):
+class BaseProcess(object):
+    """
+    An abstract class for formulating scientific problems as computational problems. This class handles the tedious,
+    science-agnostic, file-operations, parallel-computations, and book-keeping operations such that children classes
+    only need to specify application-relevant code for processing the data.
+    """
+
+    def __init__(self, h5_main, *args, verbose=False, **kwargs):
+        """
+        Parameters
+        ----------
+        h5_main : :class:`~pyUSID.io.usi_data.USIDataset`
+            The USID main HDF5 dataset over which the analysis will be performed.
+        verbose : bool, Optional, default = False
+            Whether or not to print debugging statements
+        """
+
+        if h5_main.file.mode != 'r+':
+            raise TypeError('Need to ensure that the file is in r+ mode to write results back to the file')
+
+        # Checking if dataset is "Main"
+        if not check_if_main(h5_main):
+            raise ValueError('Provided dataset is not a "Main" dataset with necessary ancillary datasets')
+
+        # Saving these as properties of the object:
+        self.h5_main = USIDataset(h5_main)
+        self.verbose = verbose
+
+        self.duplicate_h5_groups = []
+        self.partial_h5_groups = []
+        self.process_name = None  # Reset this in the extended classes
+        self.parms_dict = None
+
+        """
+        The name of the HDF5 dataset that should be present to signify which positions have already been computed
+        This is NOT a fully private variable so that multiple processes can be run within a single group - Eg Fitter
+        In the case of Fitter - this name can be changed from 'completed_guesses' to 'completed_fits'
+        check_for_duplicates will be called by the Child class where they have the opportunity to change this
+        variable before checking for duplicates
+        """
+        self._status_dset_name = 'completed_positions'
+
+        self._results = None
+        self.h5_results_grp = None
+
+        # Check to see if the resuming feature has been implemented:
+        self.__resume_implemented = False
+        try:
+            self._get_existing_datasets()
+        except NotImplementedError:
+            if verbose:
+                print('It appears that this class may not be able to resume computations')
+        except:
+            # NameError for variables that don't exist
+            # AttributeError for self.var_name that don't exist
+            # TypeError (NoneType) etc.
+            self.__resume_implemented = True
+
+        print(
+            'Consider calling test() to check results before calling compute() which computes on the entire'
+            ' dataset and writes back to the HDF5 file')
+
+        # DON'T check for duplicates since parms_dict has not yet been initialized.
+        # Sub classes will check by themselves if they are interested.
+
+    def test(self, **kwargs):
+        """
+        Tests the process on a subset (for example a pixel) of the whole data. The class can be re-instantiated with
+        improved parameters and tested repeatedly until the user is content, at which point the user can call
+        :meth:`~pyUSID.processing.process.Process.compute` on the whole dataset.
+
+        Notes
+        -----
+        This is not a function that is expected to be called in MPI
+
+        Parameters
+        ----------
+        kwargs - dict, optional
+            keyword arguments to test the process
+        Returns
+        -------
+        """
+        # All children classes should call super() OR ensure that they only work for self.mpi_rank == 0
+        raise NotImplementedError('test_on_subset has not yet been implemented')
+
+    def _check_for_duplicates(self):
+        """
+        Checks for instances where the process was applied to the same dataset with the same parameters
+
+        Returns
+        -------
+        duplicate_h5_groups : list of h5py.Group objects
+            List of groups satisfying the above conditions
+        """
+        if self.verbose:
+            print('Checking for duplicates:')
+
+        # This list will contain completed runs only
+        duplicate_h5_groups = check_for_old(self.h5_main, self.process_name, new_parms=self.parms_dict)
+        partial_h5_groups = []
+
+        # First figure out which ones are partially completed:
+        if len(duplicate_h5_groups) > 0:
+            for index, curr_group in enumerate(duplicate_h5_groups):
+                """
+                Earlier, we only checked the 'last_pixel' but to be rigorous we should check self._status_dset_name
+                The last_pixel attribute check may be deprecated in the future.
+                Note that legacy computations did not have this dataset. We can add to partially computed datasets
+                """
+                if self._status_dset_name in curr_group.keys():
+
+                    # Case 1: Modern Process results:
+                    status_dset = curr_group[self._status_dset_name]
+
+                    if not isinstance(status_dset, h5py.Dataset):
+                        # We should not come here if things were implemented correctly
+                        print('Results group: {} contained an object named: {} that should have been a dataset'
+                              '.'.format(curr_group, self._status_dset_name))
+
+                    if self.h5_main.shape[0] != status_dset.shape[0] or len(status_dset.shape) > 1 or \
+                            status_dset.dtype != np.uint8:
+                        print('Status dataset: {} was not of the expected shape or datatype'.format(status_dset))
+
+                    # Finally, check how far the computation was completed.
+                    if len(np.where(status_dset[()] == 0)[0]) != 0:  # If there are pixels uncompleted
+                        # remove from duplicates and move to partial
+                        partial_h5_groups.append(duplicate_h5_groups.pop(index))
+                        # Let's write the legacy attribute for safety
+                        curr_group.attrs['last_pixel'] = self.h5_main.shape[0]
+                        # No further checks necessary
+                        continue
+                    else:
+                        # Optionally calculate how much was completed:
+                        if len(np.where(status_dset[()] == 0)[0]) > 0:  # if there are unfinished pixels
+                            percent_complete = int(100 * len(np.where(status_dset[()] == 0)[0]) / status_dset.shape[0])
+                            print('Group: {}: computation was {}% completed'.format(curr_group, percent_complete))
+
+                # Case 2: Legacy results group:
+                if 'last_pixel' not in curr_group.attrs.keys():
+                    # Should not be coming here at all
+                    print('Group: {} had neither the status HDF5 dataset or the legacy attribute: "last_pixel"'
+                          '.'.format(curr_group))
+                    # Not sure what to do with such groups. Don't consider them in the future
+                    duplicate_h5_groups.pop(index)
+                    continue
+
+                # Finally, do the legacy test:
+                if curr_group.attrs['last_pixel'] < self.h5_main.shape[0]:
+                    # Should we create the dataset here, to make the group future-proof?
+                    # remove from duplicates and move to partial
+                    partial_h5_groups.append(duplicate_h5_groups.pop(index))
+
+        if len(duplicate_h5_groups) > 0:
+            print('Note: ' + self.process_name + ' has already been performed with the same parameters before. '
+                                                 'These results will be returned by compute() by default. '
+                                                 'Set override to True to force fresh computation')
+            print(duplicate_h5_groups)
+
+        if len(partial_h5_groups) > 0:
+            print('Note: ' + self.process_name + ' has already been performed PARTIALLY with the same parameters. '
+                                                 'compute() will resuming computation in the last group below. '
+                                                 'To choose a different group call use_patial_computation()'
+                                                 'Set override to True to force fresh computation or resume from a '
+                                                 'data group besides the last in the list.')
+            print(partial_h5_groups)
+
+        return duplicate_h5_groups, partial_h5_groups
+
+    def use_partial_computation(self, h5_partial_group=None):
+        """
+        Extracts the necessary parameters from the provided h5 group to resume computation
+
+        Parameters
+        ----------
+        h5_partial_group : :class:`h5py.Group`
+            Group containing partially computed results
+        """
+        # Attempt to automatically take partial results
+        if h5_partial_group is None:
+            if len(self.partial_h5_groups) < 1:
+                raise ValueError('No group was found with partial results and no such group was provided')
+            h5_partial_group = self.partial_h5_groups[-1]
+        else:
+            # Make sure that this group is among the legal ones already discovered:
+            if h5_partial_group not in self.partial_h5_groups:
+                raise ValueError('Provided group does not appear to be in the list of discovered groups')
+
+        self.parms_dict = get_attributes(h5_partial_group)
+
+        self.h5_results_grp = h5_partial_group
+
+    def _create_compute_status_dataset(self):
+        """
+        Creates a dataset that keeps track of what pixels / rows have already been computed. Users are not expected to
+        extend / modify this function.
+        """
+        # Check to make sure that such a group doesn't already exist
+        if self._status_dset_name in self.h5_results_grp.keys():
+            self._h5_status_dset = self.h5_results_grp[self._status_dset_name]
+            if not isinstance(self._h5_status_dset, h5py.Dataset):
+                raise ValueError('Provided results group: {} contains an expected object ({}) that is not a dataset'
+                                 '.'.format(self.h5_results_grp, self._h5_status_dset))
+            if self.h5_main.shape[0] != self._h5_status_dset.shape[0] or len(self._h5_status_dset.shape) > 1 or \
+                    self._h5_status_dset.dtype != np.uint8:
+                raise ValueError('Status dataset: {} was not of the expected shape or datatype'
+                                 '.'.format(self._h5_status_dset))
+        else:
+            self._h5_status_dset = self.h5_results_grp.create_dataset(self._status_dset_name, dtype=np.uint8,
+                                                                      shape=(self.h5_main.shape[0],))
+            #  Could be fresh computation or resuming from a legacy computation
+            if 'last_pixel' in self.h5_results_grp.attrs.keys():
+                completed_pixels = self.h5_results_grp.attrs['last_pixel']
+                if completed_pixels > 0:
+                    self._h5_status_dset[:completed_pixels] = 1
+
+    @staticmethod
+    def _map_function(*args, **kwargs):
+        """
+        The function that manipulates the data on a single instance (position). This will be used by
+        :meth:`~pyUSID.processing.process.Process._unit_computation` to process a chunk of data in parallel
+
+        Parameters
+        ----------
+        args : list
+            arguments to the function in the correct order
+        kwargs : dict
+            keyword arguments to the function
+        Returns
+        -------
+        object
+        """
+        raise NotImplementedError('Please override the _unit_function specific to your process')
+
+    def _write_results_chunk(self):
+        """
+        Writes the computed results into appropriate datasets.
+        This needs to be rewritten since the processed data is expected to be at least as large as the dataset
+        """
+        raise NotImplementedError('Please override the _set_results specific to your process')
+
+    def _create_results_datasets(self):
+        """
+        Process specific call that will write the h5 group, guess dataset, corresponding spectroscopic datasets and also
+        link the guess dataset to the spectroscopic datasets. It is recommended that the ancillary datasets be populated
+        within this function.
+        """
+        raise NotImplementedError('Please override the _create_results_datasets specific to your process')
+
+    def _get_existing_datasets(self):
+        """
+        The purpose of this function is to allow processes to resume from partly computed results
+        Start with self.h5_results_grp
+        """
+        raise NotImplementedError('Please override _get_existing_datasets specific to your process')
+
+    def _read_data_chunk(self):
+        """
+        Reads a chunk of data for the intended computation into memory
+        """
+        raise NotImplementedError('Please override _read_data_chunk specific to your process')
+
+    def _unit_computation(self, *args, **kwargs):
+        """
+        The unit computation that is performed per data chunk. This allows room for any data pre / post-processing
+        as well as multiple calls to parallel_compute if necessary
+        """
+        raise NotImplementedError('Please override _unit_computation specific to your process')
+
+    def compute(self, override=False, *args, **kwargs):
+        """
+        Creates placeholders for the results, applies the :meth:`~pyUSID.processing.process.Process._unit_computation`
+        to chunks of the dataset
+
+        Parameters
+        ----------
+        override : bool, optional. default = False
+            By default, compute will simply return duplicate results to avoid recomputing or resume computation on a
+            group with partial results. Set to True to force fresh computation.
+        args : list
+            arguments to the mapped function in the correct order
+        kwargs : dict
+            keyword arguments to the mapped function
+
+        Returns
+        -------
+        h5_results_grp : :class:`h5py.Group`
+            Group containing all the results
+        """
+        raise NotImplementedError('Please override compute specific to your process')
+
+
+class Process(BaseProcess):
     """
     An abstract class for formulating scientific problems as computational problems. This class handles the tedious,
     science-agnostic, file-operations, parallel-computations, and book-keeping operations such that children classes
@@ -42,9 +333,7 @@ class Process(object):
         verbose : bool, Optional, default = False
             Whether or not to print debugging statements
         """
-
-        if h5_main.file.mode != 'r+':
-            raise TypeError('Need to ensure that the file is in r+ mode to write results back to the file')
+        super(Process, self).__init__(h5_main, verbose=verbose)
 
         MPI = get_MPI()
 
@@ -93,17 +382,13 @@ class Process(object):
             self.mpi_size = 1
             self.mpi_rank = 0
 
-        # Checking if dataset is "Main"
-        if not check_if_main(h5_main, verbose=verbose and self.mpi_rank == 0):
-            raise ValueError('Provided dataset is not a "Main" dataset with necessary ancillary datasets')
+        # self.verbose = verbose and self.mpi_rank == 0
 
         if MPI is not None:
             MPI.COMM_WORLD.barrier()
         # Not sure if we need a barrier here.
 
         # Saving these as properties of the object:
-        self.h5_main = USIDataset(h5_main)
-        self.verbose = verbose
         self._cores = None
         self.__ranks_on_socket = 1
         self.__socket_master_rank = 0
@@ -118,40 +403,10 @@ class Process(object):
 
         # Determining the max size of the data that can be put into memory
         # all ranks go through this and they need to have this value any
-        self._set_memory_and_cores(cores=cores, mem=max_mem_mb)
         self.duplicate_h5_groups = []
         self.partial_h5_groups = []
         self.process_name = None  # Reset this in the extended classes
         self.parms_dict = None
-
-        """
-        The name of the HDF5 dataset that should be present to signify which positions have already been computed
-        This is NOT a fully private variable so that multiple processes can be run within a single group - Eg Fitter
-        In the case of Fitter - this name can be changed from 'completed_guesses' to 'completed_fits'
-        check_for_duplicates will be called by the Child class where they have the opportunity to change this
-        variable before checking for duplicates
-        """
-        self._status_dset_name = 'completed_positions'
-
-        self._results = None
-        self.h5_results_grp = None
-
-        # Check to see if the resuming feature has been implemented:
-        self.__resume_implemented = False
-        try:
-            self._get_existing_datasets()
-        except NotImplementedError:
-            if verbose and self.mpi_rank == 0:
-                print('It appears that this class may not be able to resume computations')
-        except:
-            # NameError for variables that don't exist
-            # AttributeError for self.var_name that don't exist
-            # TypeError (NoneType) etc.
-            self.__resume_implemented = True
-
-        if self.mpi_rank == 0:
-            print('Consider calling test() to check results before calling compute() which computes on the entire'
-                  ' dataset and writes back to the HDF5 file')
 
         # DON'T check for duplicates since parms_dict has not yet been initialized.
         # Sub classes will check by themselves if they are interested.
@@ -209,136 +464,6 @@ class Process(object):
             1D array of unsigned integers denoting the pixels that will be read, processed, and written back to
         """
         return self.__pixels_in_batch
-
-    def test(self, **kwargs):
-        """
-        Tests the process on a subset (for example a pixel) of the whole data. The class can be re-instantiated with
-        improved parameters and tested repeatedly until the user is content, at which point the user can call
-        :meth:`~pyUSID.processing.process.Process.compute` on the whole dataset.
-
-        Notes
-        -----
-        This is not a function that is expected to be called in MPI
-
-        Parameters
-        ----------
-        kwargs - dict, optional
-            keyword arguments to test the process
-        Returns
-        -------
-        """
-        # All children classes should call super() OR ensure that they only work for self.mpi_rank == 0
-        raise NotImplementedError('test_on_subset has not yet been implemented')
-
-    def _check_for_duplicates(self):
-        """
-        Checks for instances where the process was applied to the same dataset with the same parameters
-
-        Returns
-        -------
-        duplicate_h5_groups : list of h5py.Group objects
-            List of groups satisfying the above conditions
-        """
-        if self.verbose and self.mpi_rank == 0:
-            print('Checking for duplicates:')
-
-        # This list will contain completed runs only
-        duplicate_h5_groups = check_for_old(self.h5_main, self.process_name, new_parms=self.parms_dict)
-        partial_h5_groups = []
-
-        # First figure out which ones are partially completed:
-        if len(duplicate_h5_groups) > 0:
-            for index, curr_group in enumerate(duplicate_h5_groups):
-                """
-                Earlier, we only checked the 'last_pixel' but to be rigorous we should check self._status_dset_name
-                The last_pixel attribute check may be deprecated in the future.
-                Note that legacy computations did not have this dataset. We can add to partially computed datasets
-                """
-                if self._status_dset_name in curr_group.keys():
-
-                    # Case 1: Modern Process results:
-                    status_dset = curr_group[self._status_dset_name]
-
-                    if not isinstance(status_dset, h5py.Dataset):
-                        # We should not come here if things were implemented correctly
-                        if self.mpi_rank == 0:
-                            print('Results group: {} contained an object named: {} that should have been a dataset'
-                                  '.'.format(curr_group, self._status_dset_name))
-
-                    if self.h5_main.shape[0] != status_dset.shape[0] or len(status_dset.shape) > 1 or \
-                            status_dset.dtype != np.uint8:
-                        if self.mpi_rank == 0:
-                            print('Status dataset: {} was not of the expected shape or datatype'.format(status_dset))
-
-                    # Finally, check how far the computation was completed.
-                    if len(np.where(status_dset[()] == 0)[0]) != 0:  # If there are pixels uncompleted
-                        # remove from duplicates and move to partial
-                        partial_h5_groups.append(duplicate_h5_groups.pop(index))
-                        # Let's write the legacy attribute for safety
-                        curr_group.attrs['last_pixel'] = self.h5_main.shape[0]
-                        # No further checks necessary
-                        continue
-                    else:
-                        # Optionally calculate how much was completed:
-                        if self.mpi_rank == 0:
-                            if len(np.where(status_dset[()] == 0)[0]) > 0:  # if there are unfinished pixels
-                                percent_complete = int(100 * len(np.where(status_dset[()] == 0)[0]) / status_dset.shape[0])
-                                print('Group: {}: computation was {}% completed'.format(curr_group, percent_complete))
-
-                # Case 2: Legacy results group:
-                if 'last_pixel' not in curr_group.attrs.keys():
-                    if self.mpi_rank == 0:
-                        # Should not be coming here at all
-                        print('Group: {} had neither the status HDF5 dataset or the legacy attribute: "last_pixel"'
-                              '.'.format(curr_group))
-                    # Not sure what to do with such groups. Don't consider them in the future
-                    duplicate_h5_groups.pop(index)
-                    continue
-
-                # Finally, do the legacy test:
-                if curr_group.attrs['last_pixel'] < self.h5_main.shape[0]:
-                    # Should we create the dataset here, to make the group future-proof?
-                    # remove from duplicates and move to partial
-                    partial_h5_groups.append(duplicate_h5_groups.pop(index))
-
-        if len(duplicate_h5_groups) > 0 and self.mpi_rank == 0:
-            print('Note: ' + self.process_name + ' has already been performed with the same parameters before. '
-                                                 'These results will be returned by compute() by default. '
-                                                 'Set override to True to force fresh computation')
-            print(duplicate_h5_groups)
-
-        if len(partial_h5_groups) > 0 and self.mpi_rank == 0:
-            print('Note: ' + self.process_name + ' has already been performed PARTIALLY with the same parameters. '
-                                                 'compute() will resuming computation in the last group below. '
-                                                 'To choose a different group call use_patial_computation()'
-                                                 'Set override to True to force fresh computation or resume from a '
-                                                 'data group besides the last in the list.')
-            print(partial_h5_groups)
-
-        return duplicate_h5_groups, partial_h5_groups
-
-    def use_partial_computation(self, h5_partial_group=None):
-        """
-        Extracts the necessary parameters from the provided h5 group to resume computation
-
-        Parameters
-        ----------
-        h5_partial_group : :class:`h5py.Group`
-            Group containing partially computed results
-        """
-        # Attempt to automatically take partial results
-        if h5_partial_group is None:
-            if len(self.partial_h5_groups) < 1:
-                raise ValueError('No group was found with partial results and no such group was provided')
-            h5_partial_group = self.partial_h5_groups[-1]
-        else:
-            # Make sure that this group is among the legal ones already discovered:
-            if h5_partial_group not in self.partial_h5_groups:
-                raise ValueError('Provided group does not appear to be in the list of discovered groups')
-
-        self.parms_dict = get_attributes(h5_partial_group)
-
-        self.h5_results_grp = h5_partial_group
 
     def _set_memory_and_cores(self, cores=None, mem=None):
         """
@@ -405,24 +530,6 @@ class Process(object):
                              self.__ranks_on_socket, self._cores))
             print('Allowed to read {} pixels per chunk'.format(self._max_pos_per_read))
 
-    @staticmethod
-    def _map_function(*args, **kwargs):
-        """
-        The function that manipulates the data on a single instance (position). This will be used by
-        :meth:`~pyUSID.processing.process.Process._unit_computation` to process a chunk of data in parallel
-
-        Parameters
-        ----------
-        args : list
-            arguments to the function in the correct order
-        kwargs : dict
-            keyword arguments to the function
-        Returns
-        -------
-        object
-        """
-        raise NotImplementedError('Please override the _unit_function specific to your process')
-
     def _read_data_chunk(self):
         """
         Reads a chunk of data for the intended computation into memory
@@ -452,46 +559,6 @@ class Process(object):
         self.__start_pos = self.__end_pos
         # This line can remain as is
         raise NotImplementedError('Please override the _set_results specific to your process')
-
-    def _create_results_datasets(self):
-        """
-        Process specific call that will write the h5 group, guess dataset, corresponding spectroscopic datasets and also
-        link the guess dataset to the spectroscopic datasets. It is recommended that the ancillary datasets be populated
-        within this function.
-        """
-        raise NotImplementedError('Please override the _create_results_datasets specific to your process')
-
-    def __create_compute_status_dataset(self):
-        """
-        Creates a dataset that keeps track of what pixels / rows have already been computed. Users are not expected to
-        extend / modify this function.
-        """
-        # Check to make sure that such a group doesn't already exist
-        if self._status_dset_name in self.h5_results_grp.keys():
-            self._h5_status_dset = self.h5_results_grp[self._status_dset_name]
-            if not isinstance(self._h5_status_dset, h5py.Dataset):
-                raise ValueError('Provided results group: {} contains an expected object ({}) that is not a dataset'
-                                 '.'.format(self.h5_results_grp, self._h5_status_dset))
-            if self.h5_main.shape[0] != self._h5_status_dset.shape[0] or len(self._h5_status_dset.shape) > 1 or \
-                    self._h5_status_dset.dtype != np.uint8:
-                if self.mpi_rank == 0:
-                    raise ValueError('Status dataset: {} was not of the expected shape or datatype'
-                                     '.'.format(self._h5_status_dset))
-        else:
-            self._h5_status_dset = self.h5_results_grp.create_dataset(self._status_dset_name, dtype=np.uint8,
-                                                                      shape=(self.h5_main.shape[0],))
-            #  Could be fresh computation or resuming from a legacy computation
-            if 'last_pixel' in self.h5_results_grp.attrs.keys():
-                completed_pixels = self.h5_results_grp.attrs['last_pixel']
-                if completed_pixels > 0:
-                    self._h5_status_dset[:completed_pixels] = 1
-
-    def _get_existing_datasets(self):
-        """
-        The purpose of this function is to allow processes to resume from partly computed results
-        Start with self.h5_results_grp
-        """
-        raise NotImplementedError('Please override the _get_existing_datasets specific to your process')
 
     def _unit_computation(self, *args, **kwargs):
         """
@@ -608,7 +675,7 @@ class Process(object):
             resuming = True
             self._get_existing_datasets()
 
-        self.__create_compute_status_dataset()
+        self._create_compute_status_dataset()
 
         if resuming and self.mpi_rank == 0:
             percent_complete = int(100 * len(np.where(self._h5_status_dset[()] == 0)[0]) /

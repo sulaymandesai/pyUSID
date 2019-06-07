@@ -9,6 +9,7 @@ Created on 7/17/16 10:08 AM
 
 from __future__ import division, print_function, absolute_import
 import numpy as np
+import dask.array as da
 import psutil
 import time as tm
 import h5py
@@ -311,6 +312,112 @@ class BaseProcess(object):
             Group containing all the results
         """
         raise NotImplementedError('Please override compute specific to your process')
+
+
+class DaskProcess(BaseProcess):
+
+    def __init__(self, h5_main, *args, verbose=False, **kwargs):
+        """
+        Parameters
+        ----------
+        h5_main : :class:`~pyUSID.io.usi_data.USIDataset`
+            The USID main HDF5 dataset over which the analysis will be performed.
+        verbose : bool, Optional, default = False
+            Whether or not to print debugging statements
+        """
+        super(DaskProcess, self).__init__(h5_main, verbose=verbose)
+
+        # Add any other book-keeping code here:
+
+    def _read_data_chunk(self):
+        """
+        Reads a chunk of data for the intended computation into memory
+        """
+
+        self.data = da.from_array(self.h5_main, chunks='auto')
+
+        # Add any other necessary code here
+
+    def compute(self, override=False, *args, **kwargs):
+        """
+        Creates placeholders for the results, applies the :meth:`~pyUSID.processing.process.Process._unit_computation`
+        to chunks of the dataset
+
+        Parameters
+        ----------
+        override : bool, optional. default = False
+            By default, compute will simply return duplicate results to avoid recomputing or resume computation on a
+            group with partial results. Set to True to force fresh computation.
+        args : list
+            arguments to the mapped function in the correct order
+        kwargs : dict
+            keyword arguments to the mapped function
+
+        Returns
+        -------
+        h5_results_grp : :class:`h5py.Group`
+            Group containing all the results
+        """
+        if not override:
+            if len(self.duplicate_h5_groups) > 0:
+                print('Returned previously computed results at ' + self.duplicate_h5_groups[-1].name)
+                return self.duplicate_h5_groups[-1]
+            elif len(self.partial_h5_groups) > 0:
+                print('Resuming computation in group: ' + self.partial_h5_groups[-1].name)
+                self.use_partial_computation()
+
+        resuming = False
+        if self.h5_results_grp is None:
+            # starting fresh
+            if self.verbose:
+                print('Creating HDF5 group and datasets to hold results')
+            self._create_results_datasets()
+        else:
+            # resuming from previous checkpoint
+            resuming = True
+            self._get_existing_datasets()
+
+        self._create_compute_status_dataset()
+
+        if resuming:
+            percent_complete = int(100 * len(np.where(self._h5_status_dset[()] == 0)[0]) /
+                self._h5_status_dset.shape[0])
+            print('Resuming computation. {}% completed already'.format(
+                percent_complete))
+
+        if self._resume_implemented:
+            print(
+                '\tThis class (likely) supports interruption and resuming of computations!\n'
+                '\tIf you are operating in a python console, press Ctrl+C or Cmd+C to abort\n'
+                '\tIf you are in a Jupyter notebook, click on "Kernel">>"Interrupt"\n'
+                '\tIf you are operating on a cluster and your job gets killed, re-run the job to resume\n')
+        else:
+            print(
+                '\tThis class does NOT support interruption and resuming of computations.\n'
+                '\tIn order to enable this feature, simply implement the _get_existing_datasets() function')
+
+        self._read_data_chunk()
+
+        # ################################################################################
+        # YOUR DASK SPECIFIC COMPUTATION CODE GOES HERE
+        # THE DATA YOU WANT TO COMPUTE ON IS IN self.data (a Dask Array)
+
+
+        # ################################################################################
+
+        self._write_results_chunk()
+
+        # ################################################################################
+        # ONCE YOU GET THE BASIC COMPUTATION TO WORK CORRECTLY, THINK ABOUT
+        # HOW THE STATUS DATASET CAN BE UPDATED SUCH THAT COMPUTATIONS CAN BE RESUMED
+        # IT MAY BE THAT YOU MAY WANT TO HAVE AN OPTION TO READ, COMPUTE, AND WRITE ONLY A FEW POSITIONS AT A TIME
+        # THIS WAY YOU CAN CHECKPOINT AFTER EACH BATCH JUST LIKE WHAT IS BEING DONE
+        # ALREADY. HOWEVER, THIS WILL NECESSITATE ALL THE UGLY BOOK-KEEPING AGAIN.
+        # MAYBE THE ANSWER IS THAT READING FEW POSITIONS AT A TIME IS A NECESSARY EVIL
+
+        self.h5_main.file.flush()
+
+        return self.h5_results_grp
 
 
 class Process(BaseProcess):

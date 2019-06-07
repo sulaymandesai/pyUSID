@@ -68,7 +68,7 @@ class BaseProcess(object):
         self.h5_results_grp = None
 
         # Check to see if the resuming feature has been implemented:
-        self.__resume_implemented = False
+        self._resume_implemented = False
         try:
             self._get_existing_datasets()
         except NotImplementedError:
@@ -78,7 +78,7 @@ class BaseProcess(object):
             # NameError for variables that don't exist
             # AttributeError for self.var_name that don't exist
             # TypeError (NoneType) etc.
-            self.__resume_implemented = True
+            self._resume_implemented = True
 
         print(
             'Consider calling test() to check results before calling compute() which computes on the entire'
@@ -395,6 +395,8 @@ class Process(BaseProcess):
         self._max_pos_per_read = None
         self._max_mem_mb = None
 
+        self._set_memory_and_cores(cores=cores, mem=max_mem_mb)
+
         # Now have to be careful here since the below properties are a function of the MPI rank
         self.__start_pos = None
         self.__rank_end_pos = None
@@ -693,7 +695,7 @@ class Process(BaseProcess):
         orig_rank_start = self.__start_pos
 
         if self.mpi_rank == 0 and self.mpi_size == 1:
-            if self.__resume_implemented:
+            if self._resume_implemented:
                 print('\tThis class (likely) supports interruption and resuming of computations!\n'
                       '\tIf you are operating in a python console, press Ctrl+C or Cmd+C to abort\n'
                       '\tIf you are in a Jupyter notebook, click on "Kernel">>"Interrupt"\n'

@@ -1,0 +1,1058 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>03. NumpyTranslator for translating from proprietary file formats &mdash; pyUSID 0.0.9 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="04. Utilities for reading h5USID files" href="plot_hdf_utils_read.html" />
+    <link rel="prev" title="02. The USIDataset" href="plot_usi_dataset.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> pyUSID
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.9
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about.html">pyUSID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../external_guides.html">Tutorials on Basics</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Examples &amp; Tutorials</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#beginner-topics">Beginner topics</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="plot_ten_mins_pyusid.html">01. pyUSID in 10 minutes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_usi_dataset.html">02. The USIDataset</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">03. NumpyTranslator for translating from proprietary file formats</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#extracting-data-and-metadata-from-proprietary-files">1. Extracting data and metadata from proprietary files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#writing-information-into-h5usid-files">2. Writing information into h5USID files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#a-numpytranslator-as-a-quick-file-writer">2.A NumpyTranslator as a quick file writer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#b-extending-the-numpytranslator">2.B Extending the NumpyTranslator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="plot_hdf_utils_read.html">04. Utilities for reading h5USID files</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#intermediate-topics">Intermediate topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../data_format.html">Data Schema and File Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contribution_guidelines.html">Guidelines for Contribution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contact.html">Contact us</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../matlab_to_python.html">Upgrading from Matlab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../scale_to_hpc.html">Scaling to High-Performance-Computing Clusters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyUSID</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Examples &amp; Tutorials</a> &raquo;</li>
+        
+      <li>03. NumpyTranslator for translating from proprietary file formats</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/auto_examples/beginner/plot_numpy_translator.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-beginner-plot-numpy-translator-py"><span class="std std-ref">here</span></a>     to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="numpytranslator-for-translating-from-proprietary-file-formats">
+<span id="sphx-glr-auto-examples-beginner-plot-numpy-translator-py"></span><h1>03. NumpyTranslator for translating from proprietary file formats<a class="headerlink" href="#numpytranslator-for-translating-from-proprietary-file-formats" title="Permalink to this headline">¶</a></h1>
+<p><strong>Suhas Somnath</strong></p>
+<p>8/8/2017</p>
+<p>This document illustrates an example of extracting data out of proprietary raw data files and writing the information
+into a <strong>Universal Spectroscopy and Imaging Data (USID)</strong> HDF5 file (referred to as a <strong>h5USID</strong> file) using the
+<code class="docutils literal notranslate"><span class="pre">pyUSID.NumpyTranslator</span></code></p>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>In most scientific disciplines, commercial instruments tend to write the data and metadata out into proprietary file
+formats that significantly impede access to the data and metadata, thwart sharing of data and correlation of data from
+multiple instruments, and complicate long-term archival, among other things. One of the data wrangling steps in science
+is the extraction of the data and metadata out of the proprietary file formats and writing the information into files
+that are easier to access, share, etc. The overwhelming part of this data wrangling effort is in investigating how to
+extract the data and metadata into memory. Often, the data and parameters in these files are <strong>not</strong> straightforward to
+access. In certain cases, additional / dedicated software packages are necessary to access the data while in many other
+cases, it is possible to extract the necessary information from built-in <strong>numpy</strong> or similar python packages included
+with <strong>anaconda</strong>. Once the information is accessible in the computer memory, such as in the
+form of numpy arrays, scientists have a wide variety of tools to write the data out into files.</p>
+<p>Simpler data such as images or single spectra can easily be written into plain text files. Simple or complex / large /
+multidimensional data can certainly be stored as numpy data files. However, there are significant drawbacks to writing
+data into non-standardized structures or file formats. First, while the structure of the data and metadata may be
+intuitive for the original author of the data, that may not be the case for another researcher. Furthermore, such
+formatting may change from a day-to-day basis. As a consequence, it becomes challenging to develop code that can accept
+such data whose format keeps changing.</p>
+<p>One solution to these challenges is to write the data out into standardized files such as <code class="docutils literal notranslate"><span class="pre">h5USID</span></code> files.
+The USID model aims to make data access, storage, curation, etc. simply by storing the data along with all
+relevant parameters in a single file (HDF5 for now).</p>
+<p>The process of copying data from the original format to <strong>h5USID</strong> files is called
+<strong>Translation</strong> and the classes available in pyUSID and children packages such as pycroscopy that perform these
+operation are called <strong>Translators</strong>.</p>
+<p>As we alluded to earlier, the process of translation can be broken down into two basic components:</p>
+<ol class="arabic simple">
+<li><p>Extracting data and metadata out of the proprietary file format</p></li>
+<li><p>Writing the extracted data and metadata into standardized h5USID files</p></li>
+</ol>
+<p>This process is the same regardless of the origin, complexity, or size of the scientific data. It is not necessary that
+the two components be disjoint - there are many situations where both components may need to happen simultaneously
+especially when the data sizes are very large.</p>
+<p>The goal of this document is to demonstrate how one would extract data and parameters from a Scanning Tunnelling
+Spectroscopy (STS) raw data file obtained from an Omicron Scanning Tunneling Microscope (STM) into a h5USID file.
+In this dataset, a spectra was collected for each position in a two-dimensional grid of spatial locations, thereby
+resulting in a 3D dataset. The data and metadata in this example are small enough that the translation process can
+indeed be separated out into two distinct components.</p>
+<p>The code in this example is an abbreviation of the
+<a class="reference external" href="https://github.com/pycroscopy/pycroscopy/blob/master/pycroscopy/io/translators/omicron_asc.py">AscTranslator</a>
+available in our sister package - <cite>pycroscopy</cite>.</p>
+<div class="section" id="recommended-pre-requisite-reading">
+<h3>Recommended pre-requisite reading<a class="headerlink" href="#recommended-pre-requisite-reading" title="Permalink to this headline">¶</a></h3>
+<p>Before proceeding with this example, we recommend reading the previous documents to learn more about:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="/../../USID/usid_model.html">Universal Spectroscopic and Imaging Data (USID) model</a></p></li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>You can download and run this document as a Jupyter notebook using the link at the bottom of this page.</p>
+</div>
+</div>
+<div class="section" id="import-all-necessary-packages">
+<h3>Import all necessary packages<a class="headerlink" href="#import-all-necessary-packages" title="Permalink to this headline">¶</a></h3>
+<p>There are a few setup procedures that need to be followed before any code is written. In this step, we simply load a
+few python packages that will be necessary in the later steps.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Ensure python 3 compatibility:</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">unicode_literals</span>
+
+<span class="c1"># The package for accessing files in directories, etc.:</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">zipfile</span>
+
+<span class="c1"># Warning package in case something goes wrong</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+
+<span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="n">package</span><span class="p">):</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s2">&quot;-m&quot;</span><span class="p">,</span> <span class="s2">&quot;pip&quot;</span><span class="p">,</span> <span class="s2">&quot;install&quot;</span><span class="p">,</span> <span class="n">package</span><span class="p">])</span>
+<span class="c1"># Package for downloading online files:</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="c1"># This package is not part of anaconda and may need to be installed.</span>
+    <span class="kn">import</span> <span class="nn">wget</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">warn</span><span class="p">(</span><span class="s1">&#39;wget not found.  Will install with pip.&#39;</span><span class="p">)</span>
+    <span class="kn">import</span> <span class="nn">pip</span>
+    <span class="n">install</span><span class="p">(</span><span class="n">wget</span><span class="p">)</span>
+    <span class="kn">import</span> <span class="nn">wget</span>
+
+<span class="c1"># The mathematical computation package:</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># The package used for creating and manipulating HDF5 files:</span>
+<span class="kn">import</span> <span class="nn">h5py</span>
+
+<span class="c1"># Packages for plotting:</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1"># import sidpy - supporting package for pyUSID:</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">sidpy</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">warn</span><span class="p">(</span><span class="s1">&#39;sidpy not found.  Will install with pip.&#39;</span><span class="p">)</span>
+    <span class="kn">import</span> <span class="nn">pip</span>
+    <span class="n">install</span><span class="p">(</span><span class="s1">&#39;sidpy&#39;</span><span class="p">)</span>
+    <span class="kn">import</span> <span class="nn">sidpy</span>
+
+<span class="c1"># Finally import pyUSID:</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">pyUSID</span> <span class="k">as</span> <span class="nn">usid</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">warn</span><span class="p">(</span><span class="s1">&#39;pyUSID not found.  Will install with pip.&#39;</span><span class="p">)</span>
+    <span class="kn">import</span> <span class="nn">pip</span>
+    <span class="n">install</span><span class="p">(</span><span class="s1">&#39;pyUSID&#39;</span><span class="p">)</span>
+    <span class="kn">import</span> <span class="nn">pyUSID</span> <span class="k">as</span> <span class="nn">usid</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="procure-the-raw-data-file">
+<h3>Procure the Raw Data file<a class="headerlink" href="#procure-the-raw-data-file" title="Permalink to this headline">¶</a></h3>
+<p>Here we will download a compressed data file from Github and unpack it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://raw.githubusercontent.com/pycroscopy/pyUSID/master/data/STS.zip&#39;</span>
+<span class="n">zip_path</span> <span class="o">=</span> <span class="s1">&#39;STS.zip&#39;</span>
+<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">zip_path</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">zip_path</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">wget</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">zip_path</span><span class="p">,</span> <span class="n">bar</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+<span class="n">zip_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">zip_path</span><span class="p">)</span>
+<span class="c1"># figure out the folder to unzip the zip file to</span>
+<span class="n">folder_path</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">zip_path</span><span class="p">)</span>
+<span class="n">zip_ref</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zip_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="c1"># unzip the file</span>
+<span class="n">zip_ref</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">folder_path</span><span class="p">)</span>
+<span class="n">zip_ref</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="c1"># delete the zip file</span>
+<span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">zip_path</span><span class="p">)</span>
+
+<span class="n">data_file_path</span> <span class="o">=</span> <span class="s1">&#39;STS.asc&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="extracting-data-and-metadata-from-proprietary-files">
+<h2>1. Extracting data and metadata from proprietary files<a class="headerlink" href="#extracting-data-and-metadata-from-proprietary-files" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="explore-the-raw-data-file">
+<h3>1.1 Explore the raw data file<a class="headerlink" href="#explore-the-raw-data-file" title="Permalink to this headline">¶</a></h3>
+<p>Inherently, one may not know how to read these <code class="docutils literal notranslate"><span class="pre">.asc</span></code> files. One option is to try and read the file as a text file
+one line at a time.</p>
+<p>If one is lucky, as in the case of these <code class="docutils literal notranslate"><span class="pre">.asc</span></code> files, the file can be read like conventional text files.</p>
+<p>Here is how we tested to see if the <code class="docutils literal notranslate"><span class="pre">asc</span></code> files could be interpreted as text files. Below, we read just the first 10
+lines in the file</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">data_file_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_handle</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">lin_ind</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">file_handle</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span># File Format = ASCII
+# Created by SPIP 4.6.5.0 2016-09-22 13:32
+# Original file: C:\Users\Administrator\AppData\Roaming\Omicron NanoTechnology\MATRIX\default\Results\16-Sep-2016\I(V) TraceUp Tue Sep 20 09.17.08 2016 [14-1]  STM_Spectroscopy STM
+# x-pixels = 100
+# y-pixels = 100
+# x-length = 29.7595
+# y-length = 29.7595
+# x-offset = -967.807
+# y-offset = -781.441
+# z-points = 500
+</pre></div>
+</div>
+</div>
+<div class="section" id="read-the-contents-of-the-file">
+<h3>1.2 Read the contents of the file<a class="headerlink" href="#read-the-contents-of-the-file" title="Permalink to this headline">¶</a></h3>
+<p>Now that we know that these files are simple text files, we can manually go through the file to find out which lines
+are important, at what lines the data starts etc.
+Manual investigation of such <code class="docutils literal notranslate"><span class="pre">.asc</span></code> files revealed that these files are always formatted in the same way. Also, they
+contain instrument- and experiment-related parameters in the first <code class="docutils literal notranslate"><span class="pre">403</span></code> lines and then contain data which is
+arranged as one pixel per row.</p>
+<p>STS experiments result in 3 dimensional datasets <code class="docutils literal notranslate"><span class="pre">(X,</span> <span class="pre">Y,</span> <span class="pre">current)</span></code>. In other words, a 1D array of current data (as a
+function of excitation bias) is sampled at every location on a two dimensional grid of points on the sample.
+By knowing where the parameters are located and how the data is structured, it is possible to extract the necessary
+information from these files.</p>
+<p>Since we know that the data sizes (&lt;200 MB) are much smaller than the physical memory of most computers, we can start
+by safely loading the contents of the entire file to memory.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Reading the entire file into memory</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">data_file_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_handle</span><span class="p">:</span>
+    <span class="n">string_lines</span> <span class="o">=</span> <span class="n">file_handle</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="extract-the-metadata">
+<h3>1.3 Extract the metadata<a class="headerlink" href="#extract-the-metadata" title="Permalink to this headline">¶</a></h3>
+<p>In the case of these <code class="docutils literal notranslate"><span class="pre">.asc</span></code> files, the parameters are present in the first few lines of the file. Below we will
+demonstrate how we parse the first 17 lines to extract some very important parameters. Note that there are several
+other important parameters in the next 350 or so lines. However, in the interest of brevity, we will focus only on the
+first few lines of the file. The interested reader is recommended to read the <code class="docutils literal notranslate"><span class="pre">ASCTranslator</span></code> available in
+<code class="docutils literal notranslate"><span class="pre">pycroscopy</span></code> for more complete details.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Preparing an empty dictionary to store the metadata / parameters as key-value pairs</span>
+<span class="n">parm_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+<span class="c1"># Reading parameters stored in the first few rows of the file</span>
+<span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">string_lines</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">17</span><span class="p">]:</span>
+    <span class="c1"># Remove the hash / pound symbol, if any</span>
+    <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;# &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="c1"># Remove new-line escape-character, if any</span>
+    <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="c1"># Break the line into two parts - the parameter name and the corresponding value</span>
+    <span class="n">temp</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span>
+    <span class="c1"># Remove spaces in the value. Remember, the value is still a string and not a number</span>
+    <span class="n">test</span> <span class="o">=</span> <span class="n">temp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="c1"># Now, attempt to convert the value to a number (floating point):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">test</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">test</span><span class="p">)</span>
+        <span class="c1"># In certain cases, the number is actually an integer, check and convert if it is:</span>
+        <span class="k">if</span> <span class="n">test</span> <span class="o">%</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">test</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">test</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="n">parm_dict</span><span class="p">[</span><span class="n">temp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span> <span class="o">=</span> <span class="n">test</span>
+
+<span class="c1"># Print out the parameters extracted</span>
+<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parm_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39;:</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">parm_dict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>x-pixels :       100
+y-pixels :       100
+x-length :       29.7595
+y-length :       29.7595
+x-offset :       -967.807
+y-offset :       -781.441
+z-points :       500
+z-section :      491
+z-unit :         nV
+z-range :        2000000000
+z-offset :       1116.49
+value-unit :     nA
+scanspeed :      59519000000
+voidpixels :     0
+</pre></div>
+</div>
+<p>At this point, we recommend reformatting the parameter names to standardized nomenclature.
+We realize that the materials imaging community has not yet agreed upon standardized nomenclature for metadata.
+Therefore, we leave this as an optional, yet recommended step.
+For example, in pycroscopy, we may categorize the number of rows and columns in an image under <code class="docutils literal notranslate"><span class="pre">grid</span></code> and
+data sampling parameters under <code class="docutils literal notranslate"><span class="pre">IO</span></code>.
+As an example, we may rename <code class="docutils literal notranslate"><span class="pre">x-pixels</span></code> to <code class="docutils literal notranslate"><span class="pre">positions_num_cols</span></code> and <code class="docutils literal notranslate"><span class="pre">y-pixels</span></code> to <code class="docutils literal notranslate"><span class="pre">positions_num_rows</span></code>.</p>
+</div>
+<div class="section" id="extract-parameters-that-define-dimensions">
+<h3>1.4 Extract parameters that define dimensions<a class="headerlink" href="#extract-parameters-that-define-dimensions" title="Permalink to this headline">¶</a></h3>
+<p>Just having the metadata above and the main measurement data is insufficient to fully describe experimental data.
+We also need to know how the experimental parameters were varied to acquire the multidimensional dataset at hand.
+In other words, we need to answer how the grid of locations was defined and how the bias was varied to acquire the
+current information at each location. This is precisely what we will do below.</p>
+<p>Since, we did not parse the entire list of parameters present in the file above, we will need to make some up.
+Please refer to the formal <code class="docutils literal notranslate"><span class="pre">ASCTranslator</span></code> to see how this step would have been different.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">num_rows</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">parm_dict</span><span class="p">[</span><span class="s1">&#39;y-pixels&#39;</span><span class="p">])</span>
+<span class="n">num_cols</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">parm_dict</span><span class="p">[</span><span class="s1">&#39;x-pixels&#39;</span><span class="p">])</span>
+<span class="n">num_pos</span> <span class="o">=</span> <span class="n">num_rows</span> <span class="o">*</span> <span class="n">num_cols</span>
+<span class="n">spectra_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">parm_dict</span><span class="p">[</span><span class="s1">&#39;z-points&#39;</span><span class="p">])</span>
+
+<span class="c1"># We will assume that data was collected from -3 nm to +7 nm on the Y-axis or along the rows</span>
+<span class="n">y_qty</span> <span class="o">=</span> <span class="s1">&#39;Y&#39;</span>
+<span class="n">y_units</span> <span class="o">=</span> <span class="s1">&#39;nm&#39;</span>
+<span class="n">y_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="n">num_rows</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># We will assume that data was collected from -5 nm to +5 nm on the X-axis or along the columns</span>
+<span class="n">x_qty</span> <span class="o">=</span> <span class="s1">&#39;X&#39;</span>
+<span class="n">x_units</span> <span class="o">=</span> <span class="s1">&#39;nm&#39;</span>
+<span class="n">x_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">num_cols</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># The bias was sampled from -1 to +1 V in the experiment. Here is how we generate the Bias axis:</span>
+<span class="n">bias_qty</span> <span class="o">=</span> <span class="s1">&#39;Bias&#39;</span>
+<span class="n">bias_units</span> <span class="o">=</span> <span class="s1">&#39;V&#39;</span>
+<span class="n">bias_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">spectra_length</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="extract-the-data">
+<h3>1.5 Extract the data<a class="headerlink" href="#extract-the-data" title="Permalink to this headline">¶</a></h3>
+<p>We have observed that the data in these <code class="docutils literal notranslate"><span class="pre">.asc</span></code> files are consistently present after the first <code class="docutils literal notranslate"><span class="pre">403</span></code> lines of
+parameters. Using this knowledge, we need to populate a data array using data that is currently present as text lines
+in memory (from step 2).</p>
+<p>These <code class="docutils literal notranslate"><span class="pre">.asc</span></code> file store the 3D data (X, Y, spectra) as a 2D matrix (positions, spectra). In other words, the spectra
+are arranged one below another. Thus, reading the 2D matrix from top to bottom, the data arranged column-by-column,
+and then row-by-row So, for simplicity, we will prepare an empty 2D numpy array to store the data as it exists in the
+raw data file.</p>
+<p>Recall that in step 2, we were lucky enough to read the entire data file into memory given its small size.
+The data is already present in memory as a list of strings that need to be parsed as a matrix of numbers.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">num_headers</span> <span class="o">=</span> <span class="mi">403</span>
+
+<span class="n">raw_data_2d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">num_pos</span><span class="p">,</span> <span class="n">spectra_length</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+<span class="c1"># Iterate over ever measurement position:</span>
+<span class="k">for</span> <span class="n">pos_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_pos</span><span class="p">):</span>
+    <span class="c1"># First, get the correct (string) line corresponding to the current measurement position.</span>
+    <span class="c1"># Recall that we would need to skip the many header lines to get to the data</span>
+    <span class="n">this_line</span> <span class="o">=</span> <span class="n">string_lines</span><span class="p">[</span><span class="n">num_headers</span> <span class="o">+</span> <span class="n">pos_index</span><span class="p">]</span>
+    <span class="c1"># Each (string) line contains numbers separated by tabs (``\t``). Let us break the line into several shorter strings</span>
+    <span class="c1"># each containing one number. We will ignore the last entry since it is empty.</span>
+    <span class="n">string_spectrum</span> <span class="o">=</span> <span class="n">this_line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># omitting the new line</span>
+    <span class="c1"># Now that we have a list of numbers represented as strings, we need to convert this list to a 1D numpy array</span>
+    <span class="c1"># the converted array is set to the appropriate position in the main 2D array.</span>
+    <span class="n">raw_data_2d</span><span class="p">[</span><span class="n">pos_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">string_spectrum</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If the data is so large that it cannot fit into memory, we would need to read data one (or a few) position(s) at a
+time, process it (e.g. convert from string to numbers), and write it to the HDF5 file without keeping much or any data
+in memory.</p>
+<p>The three-dimensional dataset (<code class="docutils literal notranslate"><span class="pre">Y</span></code>, <code class="docutils literal notranslate"><span class="pre">X</span></code>, <code class="docutils literal notranslate"><span class="pre">Bias</span></code>) is currently represented as a two-dimensional array:
+(<code class="docutils literal notranslate"><span class="pre">X</span></code> * <code class="docutils literal notranslate"><span class="pre">Y</span></code>, <code class="docutils literal notranslate"><span class="pre">Bias</span></code>). To make it easier for us to understand and visualize, we can turn it into a 3D array:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">raw_data_3d</span> <span class="o">=</span> <span class="n">raw_data_2d</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_rows</span><span class="p">,</span> <span class="n">num_cols</span><span class="p">,</span> <span class="n">spectra_length</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Shape of 2D data: </span><span class="si">{}</span><span class="s1">, Shape of 3D data: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">raw_data_2d</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">raw_data_3d</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Shape of 2D data: (10000, 500), Shape of 3D data: (100, 100, 500)
+</pre></div>
+</div>
+<p>Just as we did for the parameters (<code class="docutils literal notranslate"><span class="pre">X</span></code>, <code class="docutils literal notranslate"><span class="pre">Y</span></code>, and <code class="docutils literal notranslate"><span class="pre">Bias</span></code>) that were varied in the experiment,
+we need to specify the quantity that is recorded from the sensors / detectors, units, and what the data
+represents:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">main_data_name</span> <span class="o">=</span> <span class="s1">&#39;STS&#39;</span>
+<span class="n">main_qty</span> <span class="o">=</span> <span class="s1">&#39;Current&#39;</span>
+<span class="n">main_units</span> <span class="o">=</span> <span class="s1">&#39;nA&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="visualize-the-extracted-data">
+<h3>Visualize the extracted data<a class="headerlink" href="#visualize-the-extracted-data" title="Permalink to this headline">¶</a></h3>
+<p>Here is a visualization of the current-voltage spectra at a few locations:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">sidpy</span><span class="o">.</span><span class="n">plot_utils</span><span class="o">.</span><span class="n">plot_curves</span><span class="p">(</span><span class="n">bias_vec</span><span class="p">,</span> <span class="n">raw_data_2d</span><span class="p">,</span> <span class="n">num_plots</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span>
+                                        <span class="n">x_label</span><span class="o">=</span><span class="n">bias_qty</span> <span class="o">+</span> <span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="n">bias_units</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span>
+                                        <span class="n">y_label</span><span class="o">=</span><span class="n">main_qty</span> <span class="o">+</span> <span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="n">main_units</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span>
+                                        <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Current-Voltage Spectra at different locations&#39;</span><span class="p">,</span>
+                                        <span class="n">fig_title_yoffset</span><span class="o">=</span><span class="mf">1.05</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="Current-Voltage Spectra at different locations, Position 0, Position 1249, Position 2499, Position 3749, Position 4999, Position 6249, Position 7499, Position 8749, Position 9999" class="sphx-glr-single-img" src="../../_images/sphx_glr_plot_numpy_translator_001.png" />
+<p>Here is a visualization of spatial maps at different bias values</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">sidpy</span><span class="o">.</span><span class="n">plot_utils</span><span class="o">.</span><span class="n">plot_map_stack</span><span class="p">(</span><span class="n">raw_data_3d</span><span class="p">,</span> <span class="n">reverse_dims</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pad_mult</span><span class="o">=</span><span class="p">(</span><span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">),</span>
+                                           <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Spatial maps of current at different bias&#39;</span><span class="p">,</span> <span class="n">stdevs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                                           <span class="n">color_bar_mode</span><span class="o">=</span><span class="s1">&#39;single&#39;</span><span class="p">,</span> <span class="n">num_ticks</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">x_vec</span><span class="o">=</span><span class="n">x_vec</span><span class="p">,</span> <span class="n">y_vec</span><span class="o">=</span><span class="n">y_vec</span><span class="p">,</span>
+                                           <span class="n">evenly_spaced</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fig_mult</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">title_yoffset</span><span class="o">=</span><span class="mf">0.95</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">axis</span><span class="p">,</span> <span class="n">bias_ind</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">bias_vec</span><span class="p">),</span> <span class="mi">9</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint</span><span class="p">)):</span>
+    <span class="n">axis</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Bias = </span><span class="si">%3.2f</span><span class="s1"> V&#39;</span> <span class="o">%</span> <span class="n">bias_vec</span><span class="p">[</span><span class="n">bias_ind</span><span class="p">])</span>
+</pre></div>
+</div>
+<img alt="Spatial maps of current at different bias, Bias = -1.00 V, Bias = -0.78 V, Bias = -0.56 V, Bias = -0.33 V, Bias = -0.11 V, Bias = 0.11 V, Bias = 0.33 V, Bias = 0.56 V, Bias = 0.78 V" class="sphx-glr-single-img" src="../../_images/sphx_glr_plot_numpy_translator_002.png" />
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/travis/virtualenv/python3.7.1/lib/python3.7/site-packages/sidpy/viz/plot_utils/image.py:378: MatplotlibDeprecationWarning:
+The &#39;add_all&#39; parameter of __init__() was deprecated in Matplotlib 3.3 and will be removed two minor releases later. If any parameter follows &#39;add_all&#39;, they should be passed as keyword, not positionally.
+  **igkwargs)
+/home/travis/virtualenv/python3.7.1/lib/python3.7/site-packages/sidpy/viz/plot_utils/image.py:404: MatplotlibDeprecationWarning: Since 3.2, mpl_toolkits&#39;s own colorbar implementation is deprecated; it will be removed two minor releases later.  Set the &#39;mpl_toolkits.legacy_colorbar&#39; rcParam to False to use Matplotlib&#39;s default colorbar implementation and suppress this deprecation warning.
+  cb = axes.cbar_axes[0].colorbar(im)
+/home/travis/virtualenv/python3.7.1/lib/python3.7/site-packages/mpl_toolkits/axes_grid1/axes_grid.py:46: MatplotlibDeprecationWarning:
+The mpl_toolkits.axes_grid1.colorbar module was deprecated in Matplotlib 3.2 and will be removed two minor releases later. Use matplotlib.colorbar instead.
+  from .colorbar import Colorbar
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="writing-information-into-h5usid-files">
+<h2>2. Writing information into h5USID files<a class="headerlink" href="#writing-information-into-h5usid-files" title="Permalink to this headline">¶</a></h2>
+<p>So far, we have captured all the information from the <code class="docutils literal notranslate"><span class="pre">.asc</span></code> files. We are now ready to write the data into USID
+formatted HDF5 files! We will be using the <code class="docutils literal notranslate"><span class="pre">pyUSID.NumpyTranslator</span></code> class for this stage.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">NumpyTranslator</span></code> class can be used in two different ways. We will go over both methods.</p>
+</div>
+<div class="section" id="a-numpytranslator-as-a-quick-file-writer">
+<h2>2.A NumpyTranslator as a quick file writer<a class="headerlink" href="#a-numpytranslator-as-a-quick-file-writer" title="Permalink to this headline">¶</a></h2>
+<p>Though not intended to be used in this manner, the <code class="docutils literal notranslate"><span class="pre">NumpyTranslator</span></code> can be used in scripts to quickly write out
+data into a HDF5 file. The benefit over simply saving data using
+<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.save.html">numpy.save()</a> is that the data will be
+written in a way that it will be accessible by the <a class="reference external" href="./plot_usi_dataset.html">pyUSID.USIDataset</a> class that offers
+several handy capabilities. Such usage of the <code class="docutils literal notranslate"><span class="pre">NumpyTranslator</span></code> offers minimal benefits over using the
+<a class="reference external" href="../intermediate/plot_hdf_utils_write.html#write-main-dataset">pyUSID.hdf_utils.write_main_data()</a> function,
+upon which it is based.</p>
+<div class="section" id="a-1-preparing-the-name-of-the-new-hdf5-file">
+<h3>2.A.1 Preparing the name of the new HDF5 file<a class="headerlink" href="#a-1-preparing-the-name-of-the-new-hdf5-file" title="Permalink to this headline">¶</a></h3>
+<p>Below, we will specify the name of the HDF5 file that we want to write the prepared data and metadata. This step
+would need to be performed regardless of whether one is writing data out into numpy files, text files, spreadsheets,
+or h5USID files (this case).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># First, let us separate the file name from the path to the folder containing the raw data file</span>
+<span class="n">folder_path</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">data_file_path</span><span class="p">)</span>
+<span class="c1"># Next, we will remove the ``.asc`` extension</span>
+<span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;_Script&#39;</span>
+<span class="c1"># The new file name will share the same base name as the original file but will end with a ``.h5`` extension.</span>
+<span class="c1"># This HDF5 or H5 file will live in the same folder as the raw data file</span>
+<span class="n">h5_path_1</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder_path</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">+</span> <span class="s1">&#39;.h5&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Indeed, a simple <code class="docutils literal notranslate"><span class="pre">replace('.asc',</span> <span class="pre">'.h5')</span></code> might have done the same job. However, the above method is recommended</p>
+</div>
+<div class="section" id="a-2-preparing-dimension-objects">
+<h3>2.A.2 Preparing <cite>Dimension</cite> objects<a class="headerlink" href="#a-2-preparing-dimension-objects" title="Permalink to this headline">¶</a></h3>
+<p>Before the <code class="docutils literal notranslate"><span class="pre">NumpyTranslator</span></code> can be used, we need to formally define the dimensions that define the
+three-dimensional measurement in the data file. In this example, we have two <cite>Position</cite> dimensions - <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">Y</span></code>
+and one <cite>Spectroscopic</cite> dimension - <code class="docutils literal notranslate"><span class="pre">Bias</span></code> against which data for each spectra were collected.</p>
+<p>In pyUSID, we formally define dimensions using simple
+<a class="reference external" href="../intermediate/plot_write_utils.html#dimension">pyUSID.Dimension</a> objects. These <code class="docutils literal notranslate"><span class="pre">Dimension</span></code> objects are simply
+descriptors of dimensions and take the name of the quantity, physical units, and the values over which the dimension
+was varied. Both, the <cite>Position</cite> and <cite>Spectroscopic</cite> dimensions need to be defined using <code class="docutils literal notranslate"><span class="pre">Dimension</span></code> objects and the
+<code class="docutils literal notranslate"><span class="pre">Dimension</span></code> objects should be arranged from fastest varying to slowest varying dimensions.</p>
+<p>The <cite>Spectroscopic</cite> dimensions are trivial since we only have one dimension - <code class="docutils literal notranslate"><span class="pre">Bias</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">spec_dims</span> <span class="o">=</span> <span class="n">usid</span><span class="o">.</span><span class="n">Dimension</span><span class="p">(</span><span class="n">bias_qty</span><span class="p">,</span> <span class="n">bias_units</span><span class="p">,</span> <span class="n">bias_vec</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Given that the spectra were acquired column-by-column and then row-by-row, we would need to arrange the <cite>Position</cite>
+dimensions as <code class="docutils literal notranslate"><span class="pre">X</span></code> followed by <code class="docutils literal notranslate"><span class="pre">Y</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pos_dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">usid</span><span class="o">.</span><span class="n">Dimension</span><span class="p">(</span><span class="n">x_qty</span><span class="p">,</span> <span class="n">x_units</span><span class="p">,</span> <span class="n">x_vec</span><span class="p">),</span>
+            <span class="n">usid</span><span class="o">.</span><span class="n">Dimension</span><span class="p">(</span><span class="n">y_qty</span><span class="p">,</span> <span class="n">y_units</span><span class="p">,</span> <span class="n">y_vec</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="a-3-reshape-the-main-data-if-necessary">
+<h3>2.A.3 Reshape the Main data (if necessary)<a class="headerlink" href="#a-3-reshape-the-main-data-if-necessary" title="Permalink to this headline">¶</a></h3>
+<p>Recall that <code class="docutils literal notranslate"><span class="pre">Main</span></code> datasets in USID are two dimensional in shape where all position dimensions (<code class="docutils literal notranslate"><span class="pre">X</span></code>, and <code class="docutils literal notranslate"><span class="pre">Y</span></code> in
+this case) are collapsed along the first axis and the spectroscopic dimensions (<code class="docutils literal notranslate"><span class="pre">Bias</span></code> in this case) are
+collapsed along the second axis. Fortunately, this is exactly how the data was already laid out in the original raw
+data file. So, we can use that two-dimensional array as is. We can skip this step.</p>
+</div>
+<div class="section" id="a-4-writing-to-a-h5usid-file">
+<h3>2.A.4 Writing to a h5USID file<a class="headerlink" href="#a-4-writing-to-a-h5usid-file" title="Permalink to this headline">¶</a></h3>
+<p>We are now ready to use the <code class="docutils literal notranslate"><span class="pre">NumpyTranslator!</span></code>
+The NumpyTranslator simplifies the creation of h5USID files. It handles the HDF5 file creation,
+HDF5 dataset creation and writing, creation of ancillary HDF5 datasets, group creation, writing parameters, linking
+ancillary datasets to the main dataset etc. With a single call to the <code class="docutils literal notranslate"><span class="pre">translate()</span></code> function of the
+<code class="docutils literal notranslate"><span class="pre">NumpyTranslator</span></code>, we complete the translation process:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tran</span> <span class="o">=</span> <span class="n">usid</span><span class="o">.</span><span class="n">NumpyTranslator</span><span class="p">()</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">tran</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">h5_path_1</span><span class="p">,</span> <span class="n">main_data_name</span><span class="p">,</span>
+                   <span class="n">raw_data_2d</span><span class="p">,</span> <span class="n">main_qty</span><span class="p">,</span> <span class="n">main_units</span><span class="p">,</span>
+                   <span class="n">pos_dims</span><span class="p">,</span> <span class="n">spec_dims</span><span class="p">,</span>
+                   <span class="n">parm_dict</span><span class="o">=</span><span class="n">parm_dict</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/travis/virtualenv/python3.7.1/lib/python3.7/site-packages/sidpy/sid/translator.py:44: FutureWarning: Consider using sidpy.Reader instead of sidpy.Translator if possible and contribute your reader to ScopeReaders
+  FutureWarning)
+/home/travis/virtualenv/python3.7.1/lib/python3.7/site-packages/pyUSID/io/hdf_utils/simple.py:1096: UserWarning: In the future write_ind_val_dsets will default to requiring dimensions to be arranged from slowest to fastest varying
+  warn(&#39;In the future write_ind_val_dsets will default to requiring dimensions to be arranged from slowest to fastest varying&#39;)
+/home/travis/virtualenv/python3.7.1/lib/python3.7/site-packages/pyUSID/io/hdf_utils/simple.py:1153: UserWarning: pyUSID.io.hdf_utils.simple.write_ind_val_dsets no longer createsregion references for each dimension. Please use pyUSID.io.reg_ref.write_region_references to manually create region references
+  warn(&#39;pyUSID.io.hdf_utils.simple.write_ind_val_dsets no longer creates&#39;
+</pre></div>
+</div>
+</div>
+<div class="section" id="verifying-the-newly-written-h5-file">
+<h3>Verifying the newly written H5 file:<a class="headerlink" href="#verifying-the-newly-written-h5-file" title="Permalink to this headline">¶</a></h3>
+<p>Let us perform some simple and quick verification to show that the data has indeed been translated correctly:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">h5_path_1</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">h5_file</span><span class="p">:</span>
+    <span class="c1"># See if a tree has been created within the hdf5 file:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Contents of the h5USID file:&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~&#39;</span><span class="p">)</span>
+    <span class="n">sidpy</span><span class="o">.</span><span class="n">hdf_utils</span><span class="o">.</span><span class="n">print_tree</span><span class="p">(</span><span class="n">h5_file</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Comprehensive information about the Main dataset:&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-------------------------------------------------&#39;</span><span class="p">)</span>
+    <span class="n">h5_main</span> <span class="o">=</span> <span class="n">usid</span><span class="o">.</span><span class="n">hdf_utils</span><span class="o">.</span><span class="n">get_all_main</span><span class="p">(</span><span class="n">h5_file</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">h5_main</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Verification plots:&#39;</span><span class="p">)</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+    <span class="n">spat_map</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">h5_main</span><span class="p">[:,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+    <span class="n">sidpy</span><span class="o">.</span><span class="n">plot_utils</span><span class="o">.</span><span class="n">plot_map</span><span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">spat_map</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Spatial map&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Y&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">h5_main</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                 <span class="n">h5_main</span><span class="p">[</span><span class="mi">250</span><span class="p">])</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;IV curve at a single pixel&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Tip bias [V]&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Current [nA]&#39;</span><span class="p">)</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="Spatial map, IV curve at a single pixel" class="sphx-glr-single-img" src="../../_images/sphx_glr_plot_numpy_translator_003.png" />
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Contents of the h5USID file:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/
+├ Measurement_000
+  ---------------
+  ├ Channel_000
+    -----------
+    ├ Position_Indices
+    ├ Position_Values
+    ├ Raw_Data
+    ├ Spectroscopic_Indices
+    ├ Spectroscopic_Values
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Comprehensive information about the Main dataset:
+-------------------------------------------------
+&lt;HDF5 dataset &quot;Raw_Data&quot;: shape (10000, 500), type &quot;&lt;f4&quot;&gt;
+located at:
+        /Measurement_000/Channel_000/Raw_Data
+Data contains:
+        Current (nA)
+Data dimensions and original shape:
+Position Dimensions:
+        Y - size: 100
+        X - size: 100
+Spectroscopic Dimensions:
+        Bias - size: 500
+Data Type:
+        float32
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Verification plots:
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="b-extending-the-numpytranslator">
+<h2>2.B Extending the NumpyTranslator<a class="headerlink" href="#b-extending-the-numpytranslator" title="Permalink to this headline">¶</a></h2>
+<p>What we have done above is essentially, write real measurement data and metadata into a standardized USID HDF5 file.
+As is evident above, the process of writing to the HDF5 file is rather simple because of the <code class="docutils literal notranslate"><span class="pre">NumpyTranslator</span></code>.
+However, the above code is part of a script that is susceptible to edits. Minor changes in the naming / formatting of
+certain strings, reshaping of the datasets can very quickly break analysis or visualization code later on.
+Encapsulating the data reading and writing process into a formal <code class="docutils literal notranslate"><span class="pre">Translator</span></code> class also makes it easier for others
+to use it and write data into the same consistent format. In fact, upon writing the class, proprietary data files
+can be translated using just two lines as we will see below.
+Therefore, we recommend extending the <code class="docutils literal notranslate"><span class="pre">NumpyTranslator</span></code> class, when possible, instead of using it independently
+like a function.</p>
+<div class="section" id="defining-the-class">
+<h3>Defining the class<a class="headerlink" href="#defining-the-class" title="Permalink to this headline">¶</a></h3>
+<p>Writing a python class that extends the <code class="docutils literal notranslate"><span class="pre">NumpyTranslator</span></code> class is far less intimidating than it sounds. The code
+that goes into the class is virtually identical to what has been written above. In fact the code that will be written
+below is very similar to real <code class="docutils literal notranslate"><span class="pre">Translator</span></code> classes found in our sister package - <cite>pycroscopy</cite>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ExampleTranslator</span><span class="p">(</span><span class="n">usid</span><span class="o">.</span><span class="n">NumpyTranslator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The above definition of the class states that our ExampleTranslator inherits all the capabilities and</span>
+<span class="sd">    behaviors of the NumpyTranslator class and builds on top of it</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">translate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_file_path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts the data and metadata out of proprietary formatted files and writes it into a SID formatted HDF5 file</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        input_file_path : str</span>
+<span class="sd">            Path to the input data file containing all the information</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        h5_path_out_2 : str</span>
+<span class="sd">            Path to the USID HDF5 output file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        --------------------------------------------------------------------------------------------</span>
+<span class="sd">        1. Extracting data and metadata out of the proprietary file</span>
+<span class="sd">        --------------------------------------------------------------------------------------------</span>
+<span class="sd">        1.2 Read the contents of the file into memory</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_file_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_handle</span><span class="p">:</span>
+            <span class="n">string_lines</span> <span class="o">=</span> <span class="n">file_handle</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        1.3 Extract all experiment and instrument related parameters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">parm_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">string_lines</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">17</span><span class="p">]:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;# &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span>
+            <span class="n">test</span> <span class="o">=</span> <span class="n">temp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">test</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">test</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">test</span> <span class="o">%</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">test</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">test</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="n">parm_dict</span><span class="p">[</span><span class="n">temp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span> <span class="o">=</span> <span class="n">test</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        1.4 Extract or generate parameters that define the three dimensions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">num_rows</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">parm_dict</span><span class="p">[</span><span class="s1">&#39;y-pixels&#39;</span><span class="p">])</span>
+        <span class="n">num_cols</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">parm_dict</span><span class="p">[</span><span class="s1">&#39;x-pixels&#39;</span><span class="p">])</span>
+        <span class="n">num_pos</span> <span class="o">=</span> <span class="n">num_rows</span> <span class="o">*</span> <span class="n">num_cols</span>
+        <span class="n">spectra_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">parm_dict</span><span class="p">[</span><span class="s1">&#39;z-points&#39;</span><span class="p">])</span>
+
+        <span class="c1"># We will assume that data was collected from -3 nm to +7 nm on the Y-axis or along the rows</span>
+        <span class="n">y_qty</span> <span class="o">=</span> <span class="s1">&#39;Y&#39;</span>
+        <span class="n">y_units</span> <span class="o">=</span> <span class="s1">&#39;nm&#39;</span>
+        <span class="n">y_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="n">num_rows</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># We will assume that data was collected from -5 nm to +5 nm on the X-axis or along the columns</span>
+        <span class="n">x_qty</span> <span class="o">=</span> <span class="s1">&#39;X&#39;</span>
+        <span class="n">x_units</span> <span class="o">=</span> <span class="s1">&#39;nm&#39;</span>
+        <span class="n">x_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">num_cols</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># The bias was sampled from -1 to +1 V in the experiment. Here is how we generate the Bias axis:</span>
+        <span class="n">bias_qty</span> <span class="o">=</span> <span class="s1">&#39;Bias&#39;</span>
+        <span class="n">bias_units</span> <span class="o">=</span> <span class="s1">&#39;V&#39;</span>
+        <span class="n">bias_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">spectra_length</span><span class="p">)</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        1.5 Extract the data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">num_headers</span> <span class="o">=</span> <span class="mi">403</span>
+
+        <span class="n">raw_data_2d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">num_pos</span><span class="p">,</span> <span class="n">spectra_length</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+        <span class="c1"># Iterate over ever measurement position:</span>
+        <span class="k">for</span> <span class="n">pos_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_pos</span><span class="p">):</span>
+            <span class="n">this_line</span> <span class="o">=</span> <span class="n">string_lines</span><span class="p">[</span><span class="n">num_headers</span> <span class="o">+</span> <span class="n">pos_index</span><span class="p">]</span>
+            <span class="n">string_spectrum</span> <span class="o">=</span> <span class="n">this_line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># omitting the new line</span>
+            <span class="n">raw_data_2d</span><span class="p">[</span><span class="n">pos_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">string_spectrum</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        2.1 Prepare the output file path</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">folder_path</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">data_file_path</span><span class="p">)</span>
+        <span class="n">h5_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder_path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;_Class&#39;</span> <span class="o">+</span> <span class="s1">&#39;.h5&#39;</span><span class="p">)</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        --------------------------------------------------------------------------------------------</span>
+<span class="sd">        2.B Writing to h5USID file using pyUSID</span>
+<span class="sd">        --------------------------------------------------------------------------------------------</span>
+<span class="sd">        2.B.2 Expressing the Position and Spectroscopic Dimensions using pyUSID.Dimension objects</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pos_dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">usid</span><span class="o">.</span><span class="n">Dimension</span><span class="p">(</span><span class="n">x_qty</span><span class="p">,</span> <span class="n">x_units</span><span class="p">,</span> <span class="n">x_vec</span><span class="p">),</span>
+                    <span class="n">usid</span><span class="o">.</span><span class="n">Dimension</span><span class="p">(</span><span class="n">y_qty</span><span class="p">,</span> <span class="n">y_units</span><span class="p">,</span> <span class="n">y_vec</span><span class="p">)]</span>
+        <span class="n">spec_dims</span> <span class="o">=</span> <span class="n">usid</span><span class="o">.</span><span class="n">Dimension</span><span class="p">(</span><span class="n">bias_qty</span><span class="p">,</span> <span class="n">bias_units</span><span class="p">,</span> <span class="n">bias_vec</span><span class="p">)</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        2.B.3 Reshape the Main data from its original N-dimensional form to the USID 2D form</span>
+<span class="sd">            We skip this step since it is unnecessary in this case</span>
+
+<span class="sd">        2.B.4 Call the translate() function of the base NumpyTranslator class</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ExampleTranslator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">h5_path</span><span class="p">,</span> <span class="n">main_data_name</span><span class="p">,</span>
+                                                     <span class="n">raw_data_2d</span><span class="p">,</span> <span class="n">main_qty</span><span class="p">,</span> <span class="n">main_units</span><span class="p">,</span>
+                                                     <span class="n">pos_dims</span><span class="p">,</span> <span class="n">spec_dims</span><span class="p">,</span>
+                                                     <span class="n">parm_dict</span><span class="o">=</span><span class="n">parm_dict</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">h5_path</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="comments">
+<h3>Comments<a class="headerlink" href="#comments" title="Permalink to this headline">¶</a></h3>
+<p>As you can tell from above, the vast majority of the code in the Class (and the script above it) pertain to the
+first phase - the extraction of data and metadata out of the proprietary file format. The parts specific to writing
+the data to the h5USID file are no more than 4-5 lines.</p>
+<p>As you could tell by now, the code in this class is virtually identical to the code above.
+Perhaps the biggest differences between the two codes come in the definition of the class and section <code class="docutils literal notranslate"><span class="pre">2.B.4</span></code>:</p>
+<p>In section <code class="docutils literal notranslate"><span class="pre">2.A.4</span></code> above, we had instantiated the <code class="docutils literal notranslate"><span class="pre">NumpyTranslator</span></code> and called its <code class="docutils literal notranslate"><span class="pre">translate()</span></code> method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tran</span> <span class="o">=</span> <span class="n">usid</span><span class="o">.</span><span class="n">NumpyTranslator</span><span class="p">()</span>
+<span class="n">h5_path_out_1</span> <span class="o">=</span> <span class="n">tran</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In the case of the <code class="docutils literal notranslate"><span class="pre">ExampleTranslator</span></code> class above, we define the class itself as an extension / child class of the
+<code class="docutils literal notranslate"><span class="pre">NumpyTranslator</span></code> in this line:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ExampleTranslator</span><span class="p">(</span><span class="n">usid</span><span class="o">.</span><span class="n">NumpyTranslator</span><span class="p">):</span>
+</pre></div>
+</div>
+<p>This means that our <code class="docutils literal notranslate"><span class="pre">ExampleTranslator</span></code> class inherits all the capabilities (including our favorite -
+<code class="docutils literal notranslate"><span class="pre">translate()</span></code> function) and behaviors of the <code class="docutils literal notranslate"><span class="pre">NumpyTranslator</span></code> class and builds on top of it. This is why we don’t
+need to instantiate the <code class="docutils literal notranslate"><span class="pre">NumpyTranslator</span></code> in section <code class="docutils literal notranslate"><span class="pre">2.B.4</span></code>. All we are doing in our <code class="docutils literal notranslate"><span class="pre">translate()</span></code> function is
+adding the intelligence that is relevant to our specific scientific example and piggybacking on the many capabilities
+of the <code class="docutils literal notranslate"><span class="pre">NumpyTranslator</span></code> class for the actual file writing. This piggybacking is visible in the last line:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">h5_path_out_1</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ExampleTranslator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="o">....</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Essentially, we are asking <code class="docutils literal notranslate"><span class="pre">NumpyTranslator.translate()</span></code> to take over and do the rest.</p>
+<div class="section" id="using-this-exampletranslator">
+<h4>Using this ExampleTranslator<a class="headerlink" href="#using-this-exampletranslator" title="Permalink to this headline">¶</a></h4>
+<p>What we did above is provide a template for what should happen when someone provides an input file. We have not really
+tried it out yet. The lines below will illustrate how easy it becomes to perform <cite>translations</cite> from now on:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># instantiate the class first:</span>
+<span class="n">my_tran</span> <span class="o">=</span> <span class="n">ExampleTranslator</span><span class="p">()</span>
+<span class="c1"># Then call the translate function:</span>
+<span class="n">h5_path_2</span> <span class="o">=</span> <span class="n">my_tran</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">data_file_path</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/travis/virtualenv/python3.7.1/lib/python3.7/site-packages/sidpy/sid/translator.py:44: FutureWarning: Consider using sidpy.Reader instead of sidpy.Translator if possible and contribute your reader to ScopeReaders
+  FutureWarning)
+/home/travis/virtualenv/python3.7.1/lib/python3.7/site-packages/pyUSID/io/hdf_utils/simple.py:1096: UserWarning: In the future write_ind_val_dsets will default to requiring dimensions to be arranged from slowest to fastest varying
+  warn(&#39;In the future write_ind_val_dsets will default to requiring dimensions to be arranged from slowest to fastest varying&#39;)
+/home/travis/virtualenv/python3.7.1/lib/python3.7/site-packages/pyUSID/io/hdf_utils/simple.py:1153: UserWarning: pyUSID.io.hdf_utils.simple.write_ind_val_dsets no longer createsregion references for each dimension. Please use pyUSID.io.reg_ref.write_region_references to manually create region references
+  warn(&#39;pyUSID.io.hdf_utils.simple.write_ind_val_dsets no longer creates&#39;
+</pre></div>
+</div>
+<p>Once the class is written, translations become a two-line operation!</p>
+</div>
+</div>
+<div class="section" id="id1">
+<h3>Verifying the newly written H5 file:<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>Let us perform some simple and quick verification to show that the data has indeed been translated correctly:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">h5_path_2</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">h5_file</span><span class="p">:</span>
+    <span class="c1"># See if a tree has been created within the hdf5 file:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Contents of the h5USID file:&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~&#39;</span><span class="p">)</span>
+    <span class="n">sidpy</span><span class="o">.</span><span class="n">hdf_utils</span><span class="o">.</span><span class="n">print_tree</span><span class="p">(</span><span class="n">h5_file</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Comprehensive information about the Main dataset:&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-------------------------------------------------&#39;</span><span class="p">)</span>
+    <span class="n">h5_main</span> <span class="o">=</span> <span class="n">usid</span><span class="o">.</span><span class="n">hdf_utils</span><span class="o">.</span><span class="n">get_all_main</span><span class="p">(</span><span class="n">h5_file</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">h5_main</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Verification plots:&#39;</span><span class="p">)</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+    <span class="n">spat_map</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">h5_main</span><span class="p">[:,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+    <span class="n">sidpy</span><span class="o">.</span><span class="n">plot_utils</span><span class="o">.</span><span class="n">plot_map</span><span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">spat_map</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Spatial map&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Y&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">h5_main</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                 <span class="n">h5_main</span><span class="p">[</span><span class="mi">250</span><span class="p">])</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;IV curve at a single pixel&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Tip bias [V]&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Current [nA]&#39;</span><span class="p">)</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="Spatial map, IV curve at a single pixel" class="sphx-glr-single-img" src="../../_images/sphx_glr_plot_numpy_translator_004.png" />
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Contents of the h5USID file:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/
+├ Measurement_000
+  ---------------
+  ├ Channel_000
+    -----------
+    ├ Position_Indices
+    ├ Position_Values
+    ├ Raw_Data
+    ├ Spectroscopic_Indices
+    ├ Spectroscopic_Values
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Comprehensive information about the Main dataset:
+-------------------------------------------------
+&lt;HDF5 dataset &quot;Raw_Data&quot;: shape (10000, 500), type &quot;&lt;f4&quot;&gt;
+located at:
+        /Measurement_000/Channel_000/Raw_Data
+Data contains:
+        Current (nA)
+Data dimensions and original shape:
+Position Dimensions:
+        Y - size: 100
+        X - size: 100
+Spectroscopic Dimensions:
+        Bias - size: 500
+Data Type:
+        float32
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Verification plots:
+</pre></div>
+</div>
+</div>
+<div class="section" id="limits-of-the-numpytranslator">
+<h3>Limits of the NumpyTranslator<a class="headerlink" href="#limits-of-the-numpytranslator" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">NumpyTranslator</span></code> is perfect when one is dealing with a <strong>single</strong> USID <cite>Main</cite> dataset. However, if the
+proprietary file contained multiple such 3D hyperspectral images, one would need to use the lower-level functions that
+power the <code class="docutils literal notranslate"><span class="pre">NumpyTranslator</span></code>. pyUSID offers
+<a class="reference external" href="./intermediate/plot_hdf_utils_write.html#write-main-dataset">several functions</a> that make it easy to handle such
+more involved translations.</p>
+</div>
+<div class="section" id="what-about-the-base-translator-class">
+<h3>What about the base Translator class?<a class="headerlink" href="#what-about-the-base-translator-class" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">pyUSID.Translator</span></code> class is a highly abstract class and does not do much. The <code class="docutils literal notranslate"><span class="pre">Translator</span></code> class exists only
+to standardize the way in which translators are operated - the instantiation of the class followed by the call to the
+<code class="docutils literal notranslate"><span class="pre">translate()</span></code> method. The <code class="docutils literal notranslate"><span class="pre">NumpyTranslator</span></code> is itself
+a child class of the <code class="docutils literal notranslate"><span class="pre">Translator</span></code> class and is the lowest class capable of doing something by itself while still
+being application-agnostic.</p>
+</div>
+<div class="section" id="more-information">
+<h3>More information<a class="headerlink" href="#more-information" title="Permalink to this headline">¶</a></h3>
+<p>Our sister class - pycroscopy, has several
+<a class="reference external" href="https://github.com/pycroscopy/pycroscopy/tree/master/pycroscopy/io/translators">translators</a> that translate popular
+file formats generated by nanoscale imaging instruments. Some of the translators extend the <code class="docutils literal notranslate"><span class="pre">NumpyTranslator</span></code> like
+we did above, while others use the low-level functions in <code class="docutils literal notranslate"><span class="pre">pyUSID.hdf_utils</span></code>.</p>
+<p>A single, robust Translator class can handle the finer variations / modes in the data. See the
+<a class="reference external" href="https://github.com/pycroscopy/pycroscopy/blob/master/pycroscopy/io/translators/igor_ibw.py">IgorIBWTranslator</a>
+as an example.</p>
+<p>We have found python packages online to open a few proprietary file formats and have written translators using these
+packages. If you are having trouble reading the data in your files and cannot find any packages online, consider
+contacting the manufacturer of the instrument which generated the data in the proprietary format for help.</p>
+</div>
+<div class="section" id="cleaning-up">
+<h3>Cleaning up<a class="headerlink" href="#cleaning-up" title="Permalink to this headline">¶</a></h3>
+<p>Remove both the original and translated files:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">h5_path_1</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">h5_path_2</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">data_file_path</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  5.878 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-beginner-plot-numpy-translator-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/df6bf2003978f791b3c4d119f4d08d51/plot_numpy_translator.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_numpy_translator.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/4608fe4d9abbc823b581d48d12e0bd09/plot_numpy_translator.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_numpy_translator.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="plot_hdf_utils_read.html" class="btn btn-neutral float-right" title="04. Utilities for reading h5USID files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="plot_usi_dataset.html" class="btn btn-neutral float-left" title="02. The USIDataset" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2018, Suhas Somnath, Chris R. Smith, Stephen Jesse
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,302 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>GPU Computing Using CuPy &mdash; pyUSID 0.0.9 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery-dataframe.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> pyUSID
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.9
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="about.html">pyUSID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="external_guides.html">Tutorials on Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Examples &amp; Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_format.html">Data Schema and File Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contribution_guidelines.html">Guidelines for Contribution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contact.html">Contact us</a></li>
+<li class="toctree-l1"><a class="reference internal" href="credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="matlab_to_python.html">Upgrading from Matlab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scale_to_hpc.html">Scaling to High-Performance-Computing Clusters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pyUSID</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li><strong>GPU Computing Using CuPy</strong></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/cpu_to_gpu.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="gpu-computing-using-cupy">
+<h1><strong>GPU Computing Using CuPy</strong><a class="headerlink" href="#gpu-computing-using-cupy" title="Permalink to this headline">¶</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Authors</dt>
+<dd class="field-odd"><p>Emily Costa</p>
+</dd>
+<dt class="field-even">Created on</dt>
+<dd class="field-even"><p>08/07/2019</p>
+</dd>
+</dl>
+<p>Enabling GPU computing, by implementing CuPy in the Bayesian Inference package of pycroscopy, was completed.
+The following are lessons learned during the exploration of implementing CuPy for GPU computing in pyUSID functions:</p>
+<ul class="simple">
+<li><p><strong>Dimensions</strong> CuPy does not have a newaxis function, like NumPy does. Instead of using new axis to add an additional dimension, you need to use cupy.expand_dims(). Also, note that cupy does not lose a dimension during operations with vectors, like numpy, so adding another dimension is often unnecessary as there are no singular dimensions in cupy. All vectors are converted into row vectors in numpy after being operated on, which can be dealt with by adding a new axis and converting back into a column vector for further matrix operations.</p></li>
+</ul>
+<p>The following is an example of how numpy’s neawaxis function and how to use cupy’s expand_dims in its place:</p>
+<p><strong>numpy.newaxis</strong></p>
+<p>Import all necesaary modules</p>
+<blockquote>
+<div><p>In [1]: import numpy as np</p>
+</div></blockquote>
+<p>1D array</p>
+<blockquote>
+<div><p>In [2]: arr = np.arange(5)</p>
+<p>In [3]: arr.shape</p>
+<p>Out[3]: (5,)</p>
+</div></blockquote>
+<p>Make the 1D array becomes a row vector when an axis is inserted along 1st dimension</p>
+<blockquote>
+<div><p>In [4]: row_vec = arr[np.newaxis, :]</p>
+<p>In [5]: row_vec.shape</p>
+<p>Out[5]: (1, 5)</p>
+</div></blockquote>
+<p>Make the 1D array becomes a column vector when an axis is inserted along 1st dimension</p>
+<blockquote>
+<div><p>In [6]: col_vec = arr[:, np.newaxis]</p>
+<p>In [7]: col_vec.shape</p>
+<p>Out[7]: (5, 1)</p>
+</div></blockquote>
+<p><strong>cupy.expand_dims</strong></p>
+<p>Import all necesaary modules</p>
+<blockquote>
+<div><p>In [1]: import cupy as cp</p>
+</div></blockquote>
+<p>1D array</p>
+<blockquote>
+<div><p>In [2]: cp_arr = cp.arange(5)</p>
+<p>In [3]: cp_arr.shape</p>
+<p>Out[3]: (5,)</p>
+</div></blockquote>
+<p>Make the 1D array becomes a row vector when an axis is inserted along 1st dimension</p>
+<blockquote>
+<div><p>In [4]: cp_row_vec = cp.expand_dims(cp_arr, axis=0)</p>
+<p>In [5]: cp_row_vec.shape</p>
+<p>Out[5]: (1, 5)</p>
+</div></blockquote>
+<p>Make the 1D array becomes a column vector when an axis is inserted along 1st dimension</p>
+<blockquote>
+<div><p>In [6]: cp_col_vec = cp.expand_dims(cp_arr, axis=1)</p>
+<p>In [7]: cp_col_vec.shape</p>
+<p>Out[7]: (5, 1)</p>
+</div></blockquote>
+<ul class="simple">
+<li><p><strong>Append</strong> CuPy does not have an append function, as numpy does. The append function in the numpy appends values to the end of an array.</p></li>
+</ul>
+<p>The following is an example of numpy’s append function and how to use cupy’s concatonate instead:</p>
+<p><strong>numpy.append</strong></p>
+<blockquote>
+<div><p>In [1]: x = np.array([1,2,3])</p>
+<p>In [2]: y = [4,5,6]</p>
+<p>In [3]: xy = np.append(x, y)</p>
+<p>In [4]: xy</p>
+<p>Out[4]: array([1,2,3,4,5,6])</p>
+</div></blockquote>
+<p><strong>cupy.concatenate</strong></p>
+<blockquote>
+<div><p>In [1]: cp_x = cp.array([1,2,3])</p>
+<p>In [2]: cp_y = cp.array([4,5,6])</p>
+<p>In [3]: cp_xy = cp.concatenate([cp_x,cp_y], axis=0)</p>
+<p>In [4]: cp_xy</p>
+<p>Out[4]: [1 2 3 4 5 6]</p>
+</div></blockquote>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2018, Suhas Somnath, Chris R. Smith, Stephen Jesse
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

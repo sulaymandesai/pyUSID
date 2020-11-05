@@ -1,0 +1,18 @@
+
+:orphan:
+
+.. _sphx_glr_auto_examples_beginner_sg_execution_times:
+
+Computation times
+=================
+**00:08.477** total execution time for **auto_examples_beginner** files:
+
++------------------------------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_auto_examples_beginner_plot_numpy_translator.py` (``plot_numpy_translator.py``) | 00:05.878 | 0.0 MB |
++------------------------------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_auto_examples_beginner_plot_usi_dataset.py` (``plot_usi_dataset.py``)           | 00:01.654 | 0.0 MB |
++------------------------------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_auto_examples_beginner_plot_hdf_utils_read.py` (``plot_hdf_utils_read.py``)     | 00:00.473 | 0.0 MB |
++------------------------------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_auto_examples_beginner_plot_ten_mins_pyusid.py` (``plot_ten_mins_pyusid.py``)   | 00:00.472 | 0.0 MB |
++------------------------------------------------------------------------------------------------+-----------+--------+

@@ -1,0 +1,315 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Examples &amp; Tutorials &mdash; pyUSID 0.0.9 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="01. pyUSID in 10 minutes" href="beginner/plot_ten_mins_pyusid.html" />
+    <link rel="prev" title="Tutorials on Basics" href="../external_guides.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> pyUSID
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.9
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about.html">pyUSID</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../external_guides.html">Tutorials on Basics</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Examples &amp; Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#beginner-topics">Beginner topics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="beginner/plot_ten_mins_pyusid.html">01. pyUSID in 10 minutes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="beginner/plot_usi_dataset.html">02. The USIDataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="beginner/plot_numpy_translator.html">03. NumpyTranslator for translating from proprietary file formats</a></li>
+<li class="toctree-l3"><a class="reference internal" href="beginner/plot_hdf_utils_read.html">04. Utilities for reading h5USID files</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#intermediate-topics">Intermediate topics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="intermediate/plot_write_utils.html">05. Utilities that assist in writing USID data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="intermediate/plot_hdf_utils_write.html">06. Utilities for writing h5USID files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="intermediate/plot_process.html">7. Formalizing Data Processing using the Process Class</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../data_format.html">Data Schema and File Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contribution_guidelines.html">Guidelines for Contribution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact.html">Contact us</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../whats_new.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../matlab_to_python.html">Upgrading from Matlab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scale_to_hpc.html">Scaling to High-Performance-Computing Clusters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyUSID</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Examples &amp; Tutorials</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/auto_examples/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="examples-tutorials">
+<span id="sphx-glr-auto-examples"></span><h1>Examples &amp; Tutorials<a class="headerlink" href="#examples-tutorials" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>The documents below should be sufficient for you to learn how to use and even write code for pyUSID.</p></li>
+<li><p>If you haven’t already, please go through the <a class="reference external" href="./external_guides">tutorials on the basics</a> of python, numerical analysis, tools like jupyter notebooks, etc.</p></li>
+<li><p>All the documents listed below will assume familiarity with the <strong>Universal Spectroscopy and Imaging Data (USID)</strong> model. Please read <a class="reference external" href="./data_format.html">that document</a> <strong>before</strong> beginning</p></li>
+<li><p>Please <a class="reference external" href="../contact.html">get in touch</a> with us if there are topics that you think need to be clarified / expanded / deserve new tutorials, or if you find any errors.</p></li>
+<li><p>Please refer to our sister package - pycroscopy for examples on scientific data analysis and papers generated using pyUSID and pycroscopy.</p></li>
+</ul>
+<div class="sphx-glr-clear"></div><div class="section" id="beginner-topics">
+<span id="sphx-glr-auto-examples-beginner"></span><h2>Beginner topics<a class="headerlink" href="#beginner-topics" title="Permalink to this headline">¶</a></h2>
+<p>To learn <strong>how to use pyUSID</strong>, Please go through the following documents in the recommended order:</p>
+<div class="sphx-glr-thumbcontainer" tooltip="**Suhas Somnath**"><div class="figure align-default" id="id1">
+<img alt="01. pyUSID in 10 minutes" src="../_images/sphx_glr_plot_ten_mins_pyusid_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="beginner/plot_ten_mins_pyusid.html#sphx-glr-auto-examples-beginner-plot-ten-mins-pyusid-py"><span class="std std-ref">01. pyUSID in 10 minutes</span></a></span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="**Suhas Somnath**"><div class="figure align-default" id="id2">
+<img alt="02. The USIDataset" src="../_images/sphx_glr_plot_usi_dataset_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="beginner/plot_usi_dataset.html#sphx-glr-auto-examples-beginner-plot-usi-dataset-py"><span class="std std-ref">02. The USIDataset</span></a></span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="**Suhas Somnath**"><div class="figure align-default" id="id3">
+<img alt="03. NumpyTranslator for translating from proprietary file formats" src="../_images/sphx_glr_plot_numpy_translator_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="beginner/plot_numpy_translator.html#sphx-glr-auto-examples-beginner-plot-numpy-translator-py"><span class="std std-ref">03. NumpyTranslator for translating from proprietary file formats</span></a></span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="**Suhas Somnath**"><div class="figure align-default" id="id4">
+<img alt="04. Utilities for reading h5USID files" src="../_images/sphx_glr_plot_hdf_utils_read_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="beginner/plot_hdf_utils_read.html#sphx-glr-auto-examples-beginner-plot-hdf-utils-read-py"><span class="std std-ref">04. Utilities for reading h5USID files</span></a></span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-clear"></div></div>
+<div class="section" id="intermediate-topics">
+<span id="sphx-glr-auto-examples-intermediate"></span><h2>Intermediate topics<a class="headerlink" href="#intermediate-topics" title="Permalink to this headline">¶</a></h2>
+<p>To learn <strong>how to write to h5USID files, write data processing classes, or adding functionality to pyUSID</strong>, go through these additional documents in the recommended order:
+Those interested in contributing to pyUSID are encouraged to read our <a class="reference external" href="../contribution_guidelines.html">guidelines for contributing code</a></p>
+<div class="sphx-glr-thumbcontainer" tooltip="**Suhas Somnath**"><div class="figure align-default" id="id5">
+<img alt="05. Utilities that assist in writing USID data" src="../_images/sphx_glr_plot_write_utils_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="intermediate/plot_write_utils.html#sphx-glr-auto-examples-intermediate-plot-write-utils-py"><span class="std std-ref">05. Utilities that assist in writing USID data</span></a></span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="**Suhas Somnath**"><div class="figure align-default" id="id6">
+<img alt="06. Utilities for writing h5USID files" src="../_images/sphx_glr_plot_hdf_utils_write_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="intermediate/plot_hdf_utils_write.html#sphx-glr-auto-examples-intermediate-plot-hdf-utils-write-py"><span class="std std-ref">06. Utilities for writing h5USID files</span></a></span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="**Suhas Somnath, Oak Ridge National Lab**"><div class="figure align-default" id="id7">
+<img alt="7. Formalizing Data Processing using the Process Class" src="../_images/sphx_glr_plot_process_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="intermediate/plot_process.html#sphx-glr-auto-examples-intermediate-plot-process-py"><span class="std std-ref">7. Formalizing Data Processing using the Process Class</span></a></span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-clear"></div><div class="sphx-glr-footer class sphx-glr-footer-gallery docutils container">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/07fcc19ba03226cd3d83d4e40ec44385/auto_examples_python.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">all</span> <span class="pre">examples</span> <span class="pre">in</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">auto_examples_python.zip</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/6f1e7a639e0699d6164445b55e6c116d/auto_examples_jupyter.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">all</span> <span class="pre">examples</span> <span class="pre">in</span> <span class="pre">Jupyter</span> <span class="pre">notebooks:</span> <span class="pre">auto_examples_jupyter.zip</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="beginner/plot_ten_mins_pyusid.html" class="btn btn-neutral float-right" title="01. pyUSID in 10 minutes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../external_guides.html" class="btn btn-neutral float-left" title="Tutorials on Basics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2018, Suhas Somnath, Chris R. Smith, Stephen Jesse
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

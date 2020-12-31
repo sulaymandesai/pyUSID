@@ -776,13 +776,22 @@ class Process(object):
                 if completed_pixels > 0:
                     self._h5_status_dset[:completed_pixels] = 1
 
+#     def _write_source_dset_provenance(self):
+#         """
+#         Writes path of HDF5 file and path of h5_main to the results group
+#         if results are being written to a new HDF5 file
+#         """
+#         if self.h5_main.file == self.h5_results_grp.file:
+#             return
+#         write_simple_attrs(self.h5_results_grp,
+#                            {'source_file_path': self.h5_main.file.filename,
+#                             'source_dataset_path': self.h5_main.name})
+
     def _write_source_dset_provenance(self):
         """
         Writes path of HDF5 file and path of h5_main to the results group
         if results are being written to a new HDF5 file
         """
-        if self.h5_main.file == self.h5_results_grp.file:
-            return
         write_simple_attrs(self.h5_results_grp,
                            {'source_file_path': self.h5_main.file.filename,
                             'source_dataset_path': self.h5_main.name})
